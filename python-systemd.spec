@@ -7,9 +7,7 @@ License:        LGPLv2+
 Url:            https://github.com/systemd/python-systemd/archive/v%{version}.tar.gz
 Source0:        python-systemd-%{version}.tar.gz
 BuildRequires:	pkgconfig(python2)
-#BuildRequires:  systemd-devel
 BuildRequires:  python-devel
-#BuildRequires:  python-pip
 
 %description
 Provides Python scripting interface to systemd
@@ -25,10 +23,8 @@ python setup.py build_ext -i
 %install
 python setup.py install --root=%{buildroot}
 
-#%doc README.md LICENCE.txt NEWS
 
 %files
-#%doc README.md LICENSE.txt NEWS
 %defattr(0644,root,root,0755)
 %doc README.md LICENSE.txt NEWS
 %{py_platsitedir}/systemd/test/*.py
@@ -37,4 +33,3 @@ python setup.py install --root=%{buildroot}
 %{py_platsitedir}/python_systemd-%{version}-py%{py_ver}.egg-info
 
 
-#https://github.com/systemd/python-systemd/archive/v231.tar.gz
