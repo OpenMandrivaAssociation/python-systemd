@@ -8,7 +8,7 @@ Url:            https://github.com/systemd/python-systemd/archive/v%{version}.ta
 Source0:        python-systemd-%{version}.tar.gz
 BuildRequires:	pkgconfig(python2)
 BuildRequires:  python-devel
-
+BuidlRequires:	pkgconfig(libsystemd-journal)
 %description
 Provides Python scripting interface to systemd
 
