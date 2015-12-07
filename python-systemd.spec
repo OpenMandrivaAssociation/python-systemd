@@ -9,6 +9,8 @@ Source0:        python-systemd-%{version}.tar.gz
 BuildRequires:	pkgconfig(python2)
 BuildRequires:  python-devel
 BuildRequires:	pkgconfig(libsystemd-journal)
+BuildRequires:	pkgconfig(libsystemd-daemon)
+BuildRequires:	pkgconfig(libsystemd-login)
 %description
 Provides Python scripting interface to systemd
 
