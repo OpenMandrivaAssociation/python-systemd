@@ -1,37 +1,32 @@
-Summary:        Python interface to systemd
-Name:           python-systemd
-Version:        231
-Release:        1
-Group:          System/Kernel and hardware
-License:        LGPLv2+
-Url:            https://github.com/systemd/python-systemd/archive/v%{version}.tar.gz
-Source0:        python-systemd-%{version}.tar.gz
-BuildRequires:	pkgconfig(python-3.4)
-BuildRequires:	python-devel
+Summary:	Python interface to systemd
+Name:		python-systemd
+Version:	231
+Release:	2
+Group:		System/Kernel and hardware
+License:	LGPLv2+
+Url:		https://github.com/systemd/python-systemd
+Source0:	https://github.com/systemd/python-systemd/archive/v%{name}-%{version}.tar.gz
+BuildRequires:	pkgconfig(python3)
 BuildRequires:	pkgconfig(libsystemd-journal)
 BuildRequires:	pkgconfig(libsystemd-daemon)
 BuildRequires:	pkgconfig(libsystemd-login)
-%description
-Provides Python scripting interface to systemd
 
+%description
+Provides Python scripting interface to systemd.
 
 %prep
-%setup -q -n %{name}-%{version}
-
+%setup -q
 
 %build
-python setup.py build_ext -i
+%setup_compile_flags
+%{__python} setup.py build_ext -i
 
 %install
-python setup.py install --root=%{buildroot}
-
+%{__python} setup.py install --root=%{buildroot}
 
 %files
-%defattr(0644,root,root,0755)
 %doc README.md LICENSE.txt NEWS
 %{py_platsitedir}/systemd/test/*.py
 %{py_platsitedir}/systemd/*.py
 %{py_platsitedir}/systemd/*.so
 %{py_platsitedir}/python_systemd-%{version}-py%{py_ver}.egg-info
-
-
