@@ -5,7 +5,7 @@ Release:	2
 Group:		System/Kernel and hardware
 License:	LGPLv2+
 Url:		https://github.com/systemd/python-systemd
-Source0:	https://github.com/systemd/python-systemd/archive/v%{name}-%{version}.tar.gz
+Source0:	https://github.com/systemd/python-systemd/archive/v%{version}.tar.gz
 BuildRequires:	pkgconfig(python3)
 BuildRequires:	pkgconfig(libsystemd-journal)
 BuildRequires:	pkgconfig(libsystemd-daemon)
