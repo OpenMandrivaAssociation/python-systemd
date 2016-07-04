@@ -1,15 +1,13 @@
 Summary:	Python interface to systemd
 Name:		python-systemd
 Version:	231
-Release:	2
+Release:	3
 Group:		System/Kernel and hardware
 License:	LGPLv2+
 Url:		https://github.com/systemd/python-systemd
 Source0:	https://github.com/systemd/python-systemd/archive/v%{version}.tar.gz
 BuildRequires:	pkgconfig(python3)
-BuildRequires:	pkgconfig(libsystemd-journal)
-BuildRequires:	pkgconfig(libsystemd-daemon)
-BuildRequires:	pkgconfig(libsystemd-login)
+BuildRequires:	pkgconfig(libsystemd)
 
 %description
 Provides Python scripting interface to systemd.
