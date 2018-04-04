@@ -27,3 +27,6 @@ Provides Python scripting interface to systemd.
 %{py_platsitedir}/systemd/test/*.py
 %{py_platsitedir}/systemd/*.py
 %{py_platsitedir}/systemd/*.so
+%{py_platsitedir}/*.egg-info
+%{py_platsitedir}/systemd/__pycache__/*.pyc
+%{py_platsitedir}/systemd/test/__pycache__/*.pyc
