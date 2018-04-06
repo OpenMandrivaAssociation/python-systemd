@@ -1,11 +1,11 @@
 Summary:	Python interface to systemd
 Name:		python-systemd
-Version:	231
-Release:	3
+Version:	234
+Release:	1
 Group:		System/Kernel and hardware
 License:	LGPLv2+
 Url:		https://github.com/systemd/python-systemd
-Source0:	https://github.com/systemd/python-systemd/archive/v%{version}.tar.gz
+Source0:	https://github.com/systemd/python-systemd/archive/%{name}-%{version}.tar.gz
 BuildRequires:	pkgconfig(python3)
 BuildRequires:	pkgconfig(libsystemd)
 
