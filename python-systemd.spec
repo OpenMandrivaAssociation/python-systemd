@@ -1,7 +1,7 @@
 Summary:	Python interface to systemd
 Name:		python-systemd
 Version:	234
-Release:	3
+Release:	4
 Group:		System/Kernel and hardware
 License:	LGPLv2+
 Url:		https://github.com/systemd/python-systemd
