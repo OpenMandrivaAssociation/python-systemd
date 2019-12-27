@@ -17,6 +17,7 @@ Provides Python scripting interface to systemd.
 
 %build
 %setup_compile_flags
+export CFLAGS="%optflags -lpython3.8"
 %{__python} setup.py build_ext -i
 
 %install
