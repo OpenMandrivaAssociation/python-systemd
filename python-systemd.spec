@@ -1,3 +1,5 @@
+%global debug_package %{nil}
+
 Summary:	Python interface to systemd
 Name:		python-systemd
 Version:	234
