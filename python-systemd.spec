@@ -1,7 +1,7 @@
 Summary:	Python interface to systemd
 Name:		python-systemd
 Version:	234
-Release:	4
+Release:	5
 Group:		System/Kernel and hardware
 License:	LGPLv2+
 Url:		https://github.com/systemd/python-systemd
@@ -17,7 +17,7 @@ Provides Python scripting interface to systemd.
 
 %build
 %setup_compile_flags
-export CFLAGS="%optflags -lpython3.8"
+export CFLAGS="%optflags -lpython3.9"
 %{__python} setup.py build_ext -i
 
 %install
