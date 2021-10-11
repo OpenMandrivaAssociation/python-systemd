@@ -1,4 +1,5 @@
-%global debug_package %{nil}
+# Work around incomplete debug packages
+%global _empty_manifest_terminate_build 0
 
 Summary:	Python interface to systemd
 Name:		python-systemd
@@ -8,22 +9,22 @@ Group:		System/Kernel and hardware
 License:	LGPLv2+
 Url:		https://github.com/systemd/python-systemd
 Source0:	https://github.com/systemd/python-systemd/archive/%{name}-%{version}.tar.gz
-BuildRequires:	pkgconfig(python3)
+BuildRequires:	pkgconfig(python)
 BuildRequires:	pkgconfig(libsystemd)
 
 %description
 Provides Python scripting interface to systemd.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
-%setup_compile_flags
-export CFLAGS="%optflags -lpython3.9"
-%{__python} setup.py build_ext -i
+%set_build_flags
+export CFLAGS="%{optflags} -lpython%{python_version}"
+python setup.py build_ext -i
 
 %install
-%{__python} setup.py install --root=%{buildroot}
+python setup.py install --root=%{buildroot}
 
 %files
 %doc README.md LICENSE.txt NEWS
