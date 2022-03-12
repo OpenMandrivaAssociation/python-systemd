@@ -9,6 +9,10 @@ Group:		System/Kernel and hardware
 License:	LGPLv2+
 Url:		https://github.com/systemd/python-systemd
 Source0:	https://github.com/systemd/python-systemd/archive/%{name}-%{version}.tar.gz
+Patch0001:	0001-journal-avoid-warning-about-deprecated-constant.patch
+Patch0002:	0002-reader-make-PY_SSIZE_T_CLEAN.patch
+Patch0003:	0003-test-make-sure-NOTIFY_SOCKET-is-unset-in-test.patch
+Patch0004:	0004-python-systemd-namespaces.patch
 BuildRequires:	pkgconfig(python)
 BuildRequires:	pkgconfig(libsystemd)
 
@@ -19,12 +23,10 @@ Provides Python scripting interface to systemd.
 %autosetup -p1
 
 %build
-%set_build_flags
-export CFLAGS="%{optflags} -lpython%{python_version}"
-%py_build
+%make_build PYTHON=%{__python}
 
 %install
-%py_install
+%make_install PYTHON=%{__python}
 
 %files
 %doc README.md LICENSE.txt NEWS

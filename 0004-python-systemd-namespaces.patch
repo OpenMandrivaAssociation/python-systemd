@@ -1,0 +1,152 @@
+diff -Naur python-systemd-234-orig/systemd/journal.py python-systemd-234/systemd/journal.py
+--- python-systemd-234-orig/systemd/journal.py	2017-03-25 21:33:59.000000000 -0400
++++ python-systemd-234/systemd/journal.py	2021-09-16 15:19:58.140761181 -0400
+@@ -140,7 +140,7 @@
+     journal.
+ 
+     """
+-    def __init__(self, flags=None, path=None, files=None, converters=None):
++    def __init__(self, flags=None, path=None, files=None, converters=None, namespace=None):
+         """Create a new Reader.
+ 
+         Argument `flags` defines the open flags of the journal, which can be one
+@@ -149,8 +149,8 @@
+         and SYSTEM_ONLY opens only journal files of system services and the kernel.
+ 
+         Argument `path` is the directory of journal files, either a file system
+-        path or a file descriptor. Note that `flags`, `path`, and `files` are
+-        exclusive.
++        path or a file descriptor. Specify `namespace` to read from specific journal
++        namespace. Note that `flags`, `path`, `files` and `namespace` are exclusive.
+ 
+         Argument `converters` is a dictionary which updates the
+         DEFAULT_CONVERTERS to convert journal field values. Field names are used
+@@ -171,7 +171,7 @@
+             else:
+                 flags = 0
+ 
+-        super(Reader, self).__init__(flags, path, files)
++        super(Reader, self).__init__(flags, path, files, namespace)
+         if _sys.version_info >= (3, 3):
+             self.converters = _ChainMap()
+             if converters is not None:
+diff -Naur python-systemd-234-orig/systemd/_reader.c python-systemd-234/systemd/_reader.c
+--- python-systemd-234-orig/systemd/_reader.c	2021-09-16 15:19:21.536553650 -0400
++++ python-systemd-234/systemd/_reader.c	2021-09-16 15:19:58.140761181 -0400
+@@ -49,6 +49,12 @@
+ #  define HAVE_HAS_PERSISTENT_FILES
+ #endif
+ 
++#if LIBSYSTEMD_VERSION >= 245
++#  define HAVE_JOURNAL_OPEN_NAMESPACE 1
++#else
++#  define HAVE_JOURNAL_OPEN_NAMESPACE 0
++#endif
++
+ #if LIBSYSTEMD_VERSION >= 230
+ #  define HAVE_JOURNAL_OPEN_DIRECTORY_FD
+ #else
+@@ -89,17 +95,17 @@
+  * Convert a str or bytes object into a C-string path.
+  * Returns NULL on error.
+  */
+-static char* convert_path(PyObject *path, PyObject **bytes) {
++static char* str_converter(PyObject *str, PyObject **bytes) {
+ #if PY_MAJOR_VERSION >=3 && PY_MINOR_VERSION >= 1
+                 int r;
+ 
+-                r = PyUnicode_FSConverter(path, bytes);
++                r = PyUnicode_FSConverter(str, bytes);
+                 if (r == 0)
+                         return NULL;
+ 
+                 return PyBytes_AsString(*bytes);
+ #else
+-                return PyString_AsString(path);
++                return PyString_AsString(str);
+ #endif
+ }
+ 
+@@ -146,7 +152,7 @@
+                 char *s;
+ 
+                 item = PySequence_ITEM(obj, i);
+-                s = convert_path(item, &bytes);
++                s = str_converter(item, &bytes);
+                 if (!s)
+                         goto cleanup;
+ 
+@@ -225,7 +231,7 @@
+ }
+ 
+ PyDoc_STRVAR(Reader__doc__,
+-             "_Reader([flags | path | files]) -> ...\n\n"
++             "_Reader([flags | path | files | namespace]) -> ...\n\n"
+              "_Reader allows filtering and retrieval of Journal entries.\n"
+              "Note: this is a low-level interface, and probably not what you\n"
+              "want, use systemd.journal.Reader instead.\n\n"
+@@ -236,23 +242,25 @@
+              "OS_ROOT is used to open the journal from directories relative to the specified\n"
+              "directory path or file descriptor.\n"
+              "\n"
+-             "Instead of opening the system journal, argument `path` may specify a directory\n"
+-             "which contains the journal. It maybe be either a file system path (a string), or\n"
+-             "a file descriptor (an integer). Alternatively, argument `files` may specify a list\n"
+-             "of journal file names. Note that `flags`, `path`, `files`, `directory_fd` are\n"
+-             "exclusive.\n\n"
++             "If `namespace` argument is specified, the specific journal namespace will be open\n"
++             "(supported since systemd v245). Instead of opening the system journal, argument\n"
++             "`path` may specify a directory which contains the journal. It maybe be either\n"
++             "a file system path (a string), or a file descriptor (an integer). Alternatively,\n"
++             "argument `files` may specify a list of journal file names. Note that `flags`, `path`,\n"
++             "`files`, `directory_fd`, `namespace` are exclusive.\n\n"
+              "_Reader implements the context manager protocol: the journal will be closed when\n"
+              "exiting the block.");
+ static int Reader_init(Reader *self, PyObject *args, PyObject *keywds) {
+         unsigned flags = SD_JOURNAL_LOCAL_ONLY;
+-        PyObject *_path = NULL, *_files = NULL;
++        PyObject *_path = NULL, *_files = NULL, *_namespace = NULL;
+         int r;
+ 
+-        static const char* const kwlist[] = {"flags", "path", "files", NULL};
+-        if (!PyArg_ParseTupleAndKeywords(args, keywds, "|iO&O&:__init__", (char**) kwlist,
++        static const char* const kwlist[] = {"flags", "path", "files", "namespace", NULL};
++        if (!PyArg_ParseTupleAndKeywords(args, keywds, "|iO&O&O&:__init__", (char**) kwlist,
+                                          &flags,
+                                          null_converter, &_path,
+-                                         null_converter, &_files))
++                                         null_converter, &_files,
++                                         null_converter, &_namespace))
+                 return -1;
+ 
+         if (!!_path + !!_files > 1) {
+@@ -279,7 +287,7 @@
+                         char *path = NULL;
+                         _cleanup_Py_DECREF_ PyObject *path_bytes = NULL;
+ 
+-                        path = convert_path(_path, &path_bytes);
++                        path = str_converter(_path, &path_bytes);
+                         if (!path)
+                                 return -1;
+ 
+@@ -319,6 +327,20 @@
+                         r = -ENOSYS;
+ #endif
+                 }
++        } else if (_namespace) {
++#if HAVE_JOURNAL_OPEN_NAMESPACE
++                char *namespace = NULL;
++                _cleanup_Py_DECREF_ PyObject *ns_bytes = NULL;
++                namespace = str_converter(_namespace, &ns_bytes);
++                if (!namespace)
++                        return -1;
++
++                Py_BEGIN_ALLOW_THREADS
++                r = sd_journal_open_namespace(&self->j, namespace, flags);
++                Py_END_ALLOW_THREADS
++#else
++                r = -ENOSYS;
++#endif
+         } else {
+                 Py_BEGIN_ALLOW_THREADS
+                 r = sd_journal_open(&self->j, flags);
