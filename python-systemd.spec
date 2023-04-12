@@ -3,16 +3,12 @@
 
 Summary:	Python interface to systemd
 Name:		python-systemd
-Version:	234
-Release:	7
+Version:	235
+Release:	1
 Group:		System/Kernel and hardware
 License:	LGPLv2+
 Url:		https://github.com/systemd/python-systemd
 Source0:	https://github.com/systemd/python-systemd/archive/%{name}-%{version}.tar.gz
-Patch0001:	0001-journal-avoid-warning-about-deprecated-constant.patch
-Patch0002:	0002-reader-make-PY_SSIZE_T_CLEAN.patch
-Patch0003:	0003-test-make-sure-NOTIFY_SOCKET-is-unset-in-test.patch
-Patch0004:	0004-python-systemd-namespaces.patch
 BuildRequires:	pkgconfig(python)
 BuildRequires:	pkgconfig(libsystemd)
 
