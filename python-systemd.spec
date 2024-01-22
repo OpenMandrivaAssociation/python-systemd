@@ -19,10 +19,16 @@ Provides Python scripting interface to systemd.
 %autosetup -p1
 
 %build
-%make_build PYTHON=%{__python}
+%if %{cross_compiling}
+export PKG_CONFIG_PATH="%{_prefix}/%{_target_platform}/%{_lib}/pkgconfig"
+%endif
+%make_build PYTHON=%{__python} CC="%{__cc}"
 
 %install
-%make_install PYTHON=%{__python}
+%if %{cross_compiling}
+export PKG_CONFIG_PATH="%{_prefix}/%{_target_platform}/%{_lib}/pkgconfig"
+%endif
+%make_install PYTHON=%{__python} CC="%{__cc}"
 
 %files
 %doc README.md LICENSE.txt NEWS
