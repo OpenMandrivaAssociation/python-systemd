@@ -12,6 +12,7 @@ Source0:	https://github.com/systemd/python-systemd/archive/%{name}-%{version}.ta
 BuildRequires:  make
 BuildRequires:	pkgconfig(python)
 BuildRequires:	pkgconfig(libsystemd)
+BuildRequires:  python%{pyver}dist(setuptools)
 
 %description
 Provides Python scripting interface to systemd.
