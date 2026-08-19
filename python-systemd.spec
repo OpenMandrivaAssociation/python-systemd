@@ -1,5 +1,8 @@
 # Work around incomplete debug packages
 %global _empty_manifest_terminate_build 0
+# Python C extensions resolve libpython at load time; OMV --no-undefined
+# overrides meson's --allow-shlib-undefined.
+%define _disable_ld_no_undefined 1
 
 Summary:	Python interface to systemd
 Name:		python-systemd
